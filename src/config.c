@@ -67,6 +67,7 @@ static struct option long_options[] = {
   {"hevc", no_argument, NULL, 'x'},
   {"h264", no_argument, NULL, 'z'},
   {"unsupported", no_argument, NULL, 'y'},
+  {"uifriendly", no_argument, NULL, 'F'},
   {0, 0, 0, 0},
 };
 
@@ -213,6 +214,9 @@ static void parse_argument(int c, char* value, PCONFIGURATION config) {
   case 'y':
     config->unsupported_version = true;
     break;
+  case 'F':
+    config->uifriendly = true;
+    break;
   case 1:
     if (config->action == NULL)
       config->action = value;
@@ -306,6 +310,7 @@ void config_parse(int argc, char* argv[], PCONFIGURATION config) {
   config->fullscreen = true;
   config->unsupported_version = false;
   config->forcehw = false;
+  config->uifriendly = false;
   config->codec = CODEC_UNSPECIFIED;
 
   config->inputsCount = 0;
@@ -324,7 +329,7 @@ void config_parse(int argc, char* argv[], PCONFIGURATION config) {
   } else {
     int option_index = 0;
     int c;
-    while ((c = getopt_long_only(argc, argv, "-abc:d:efg:h:i:j:k:lm:no:p:q:r:stuv:w:xy", long_options, &option_index)) != -1) {
+    while ((c = getopt_long_only(argc, argv, "-abc:d:efg:h:i:j:k:lm:no:p:q:r:stuv:w:xyF", long_options, &option_index)) != -1) {
       parse_argument(c, optarg, config);
     }
   }

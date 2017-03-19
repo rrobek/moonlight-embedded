@@ -47,7 +47,7 @@
 #include <arpa/inet.h>
 #include <openssl/rand.h>
 
-static void applist(PSERVER_DATA server) {
+static void applist(PSERVER_DATA server, PCONFIGURATION config) {
   PAPP_LIST list = NULL;
   if (gs_applist(server, &list) != GS_OK) {
     fprintf(stderr, "Can't get app list\n");
@@ -55,7 +55,9 @@ static void applist(PSERVER_DATA server) {
   }
 
   for (int i = 1;list != NULL;i++) {
-    printf("%d. %s\n", i, list->name);
+    if(config->uifriendly) printf("A]");
+    else printf("%d. ", i);
+    printf("%s\n", list->name);
     list = list->next;
   }
 }
@@ -99,6 +101,7 @@ static void stream(PSERVER_DATA server, PCONFIGURATION config, enum platform sys
   if (config->forcehw)
     drFlags |= FORCE_HARDWARE_ACCELERATION;
 
+  if(config->uifriendly) printf("S]");
   printf("Stream %d x %d, %d fps, %d kbps\n", config->stream.width, config->stream.height, config->stream.fps, config->stream.bitrate);
   LiStartConnection(&server->serverInfo, &config->stream, &connection_callbacks, platform_get_video(system), platform_get_audio(system), NULL, drFlags);
 
@@ -218,6 +221,7 @@ int main(int argc, char* argv[]) {
     config_file_parse(host_config_file, &config);
 
   SERVER_DATA server;
+  if(config.uifriendly) printf("I]");
   printf("Connect to %s...\n", config.address);
 
   int ret;
@@ -237,11 +241,12 @@ int main(int argc, char* argv[]) {
     exit(-1);
   }
 
+  if(config.uifriendly) printf("G]");
   printf("NVIDIA %s, GFE %s (protocol version %d)\n", server.gpuType, server.serverInfo.serverInfoGfeVersion, server.serverMajorVersion);
 
   if (strcmp("list", config.action) == 0) {
     pair_check(&server);
-    applist(&server);
+    applist(&server, &config);
   } else if (strcmp("stream", config.action) == 0) {
     pair_check(&server);
     if (IS_EMBEDDED(system)) {
@@ -265,16 +270,19 @@ int main(int argc, char* argv[]) {
   } else if (strcmp("pair", config.action) == 0) {
     char pin[5];
     sprintf(pin, "%d%d%d%d", (int)random() % 10, (int)random() % 10, (int)random() % 10, (int)random() % 10);
+    if(config.uifriendly) printf("P]");
     printf("Please enter the following PIN on the target PC: %s\n", pin);
     if (gs_pair(&server, &pin[0]) != GS_OK) {
       fprintf(stderr, "Failed to pair to server: %s\n", gs_error);
     } else {
+      if(config.uifriendly) printf("M]");
       printf("Succesfully paired\n");
     }
   } else if (strcmp("unpair", config.action) == 0) {
     if (gs_unpair(&server) != GS_OK) {
       fprintf(stderr, "Failed to unpair to server: %s\n", gs_error);
     } else {
+      if(config.uifriendly) printf("M]");
       printf("Succesfully unpaired\n");
     }
   } else if (strcmp("quit", config.action) == 0) {

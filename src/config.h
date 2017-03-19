@@ -44,6 +44,7 @@ typedef struct _CONFIGURATION {
   bool fullscreen;
   bool forcehw;
   bool unsupported_version;
+  bool uifriendly;
   struct input_config inputs[MAX_INPUTS];
   int inputsCount;
   enum codecs codec;
