@@ -272,6 +272,7 @@ int main(int argc, char* argv[]) {
     sprintf(pin, "%d%d%d%d", (int)random() % 10, (int)random() % 10, (int)random() % 10, (int)random() % 10);
     if(config.uifriendly) printf("P]");
     printf("Please enter the following PIN on the target PC: %s\n", pin);
+    if(config.uifriendly) fflush(stdout);
     if (gs_pair(&server, &pin[0]) != GS_OK) {
       fprintf(stderr, "Failed to pair to server: %s\n", gs_error);
     } else {
